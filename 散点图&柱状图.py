@@ -3,10 +3,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+x = np.random.normal(0, 1, size=10000)
+y = np.random.normal(0, 1, size=10000)
+
 # 散点图
 fig1 = plt.figure('scatter')
-x = np.random.normal(0, 1, size = 10000)
-y = np.random.normal(0, 1, size = 10000)
 plt.figure('scatter')
 plt.scatter(x, y)
 plt.title('Scatter')
