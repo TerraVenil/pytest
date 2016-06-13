@@ -3,13 +3,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-func = lambda x : x*2 + 1
+func = lambda x : x**2 + 8
 
-x = np.linspace(-100,100,300)
+x = np.linspace(-10,10,300)
 y = func(x)
 
 plt.plot(x,y,'r-')
-plt.title('y = 2x + 1')
+plt.title('y = x^2 + 8')
 plt.xlabel('x')
 plt.ylabel('y')
 
