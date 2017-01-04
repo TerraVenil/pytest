@@ -71,7 +71,7 @@ def loadData2mysql(variety,data) :
             value.append(data['CLOSE'][i])
             value.append(data['VOL'][i])
             values.append(value)
-            if(num != 0 and num % 200 == 0) :
+            if(num != 0 and num % 100 == 0) :
                 cur.executemany(sql, values)
                 conn.commit()
                 logging.info("插入条数：" + str(len(values)))
