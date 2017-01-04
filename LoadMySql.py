@@ -49,7 +49,7 @@ def readData(file) :
     data['date'] = convertDate(data['date'])
     return data
 
-def loadData2mysql(data) :
+def loadData2mysql(variety,data) :
     sql = "insert into his_data(id,variety,period,date,open,high,low,close,vol,timestamp) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,now())"
     try:
         conn = MySQLdb.connect("120.27.92.201", "root", "Best12167", "forex")
@@ -62,7 +62,7 @@ def loadData2mysql(data) :
         for i in range(len(data)):
             value = []
             value.append(uuid.uuid4())
-            value.append('USDCAD')
+            value.append(variety)
             value.append('MIN')
             value.append(data['date'][i])
             value.append(data['OPEN'][i])
@@ -71,7 +71,7 @@ def loadData2mysql(data) :
             value.append(data['CLOSE'][i])
             value.append(data['VOL'][i])
             values.append(value)
-            if(num != 0 and num % 100 == 0) :
+            if(num != 0 and num % 200 == 0) :
                 cur.executemany(sql, values)
                 conn.commit()
                 logging.info("插入条数：" + str(len(values)))
@@ -93,7 +93,7 @@ def main() :
     logging.info("开始读取数据...")
     data = readData(file)
     logging.info("读取数据完毕")
-    loadData2mysql(data)
+    loadData2mysql('USDCAD', data)
     logging.info("插入数据完毕")
 
 if __name__ == '__main__' :
