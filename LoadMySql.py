@@ -71,16 +71,17 @@ def loadData2mysql(data) :
             value.append(data['CLOSE'][i])
             value.append(data['VOL'][i])
             values.append(value)
-            if(num % 100 == 0) :
+            if(num != 0 and num % 100 == 0) :
                 cur.executemany(sql, values)
                 conn.commit()
-                logging.info("插入条数：" + len(values))
+                logging.info("插入条数：" + str(len(values)))
                 num = 0
                 values = []
+            num = num + 1
         if(len(values) > 0) :
             cur.executemany(sql, values)
             conn.commit()
-            logging.info("插入条数：" + len(values))
+            logging.info("插入条数：" + str(len(values)))
 
         cur.close()
         conn.close()
