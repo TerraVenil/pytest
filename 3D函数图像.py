@@ -5,8 +5,8 @@ import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d
 
-x, y = np.mgrid[-10:10:50j, -10:10:50j]
-z = x**2 + y**2
+x, y = np.mgrid[-2:2:50j, -2:2:50j]
+z = x * np.exp(-x**2 - y**2)
 
 ax = plt.subplot(111, projection = '3d')
 ax.plot_surface(x, y, z, rstride=2, cstride=1, cmap=cm.jet, alpha=0.8)
