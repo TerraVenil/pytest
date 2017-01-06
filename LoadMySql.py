@@ -27,9 +27,9 @@ def completeZero(time) :
     return result
 
 #合并日期和时间
-def combineTime(yyyymmdd,time):
+def combineTime(yyyymmdd,time,count):
     result = []
-    num = 0
+    num = count
     for i in yyyymmdd :
         result.append(str(i) + completeZero(str(time[num])))
         num=num+1
@@ -42,16 +42,8 @@ def convertDate(time) :
         result.append(datetime.datetime.strptime(i, '%Y%m%d%H%M%S'))
     return result
 
-#读取历史数据
-def readData(file) :
-    data = pd.read_csv(file, sep=',', encoding='UTF-8')
-    data['date'] = combineTime(data['DTYYYYMMDD'], data['TIME'])
-    data.drop('DTYYYYMMDD')
-    data.drop('TIME')
-    data['date'] = convertDate(data['date'])
-    return data
-
-def loadData2mysql(ticker,data) :
+#插入数据库
+def loadData2mysql(data, count) :
     sql = "insert into his_data(id,ticker,period,date,open,high,low,close,vol,timestamp) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,now())"
     try:
         conn = MySQLdb.connect("120.27.92.201", "root", "Best12167", "forex")
@@ -60,30 +52,22 @@ def loadData2mysql(ticker,data) :
         conn.select_db('forex')
 
         values = []
-        num = 0
         for i in range(len(data)):
             value = []
             value.append(uuid.uuid4())
-            value.append(data['TICKER'][i])
+            value.append(data['TICKER'][i + count])
             value.append('SECOND')
-            value.append(data['date'][i])
-            value.append(data['OPEN'][i])
-            value.append(data['HIGH'][i])
-            value.append(data['LOW'][i])
-            value.append(data['CLOSE'][i])
-            value.append(data['VOL'][i])
+            value.append(data['date'][i + count])
+            value.append(data['OPEN'][i + count])
+            value.append(data['HIGH'][i + count])
+            value.append(data['LOW'][i + count])
+            value.append(data['CLOSE'][i + count])
+            value.append(data['VOL'][i + count])
             values.append(value)
-            if(num != 0 and num % 100 == 0) :
-                cur.executemany(sql, values)
-                conn.commit()
-                logging.info("插入条数：" + str(len(values)))
-                num = 0
-                values = []
-            num = num + 1
-        if(len(values) > 0) :
-            cur.executemany(sql, values)
-            conn.commit()
-            logging.info("插入条数：" + str(len(values)))
+
+        cur.executemany(sql, values)
+        conn.commit()
+        logging.info("插入条数：" + str(len(values)))
 
         cur.close()
         conn.close()
@@ -91,12 +75,26 @@ def loadData2mysql(ticker,data) :
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
 def main() :
-    file = '/backup/USDCAD.txt'
-    logging.info("开始读取数据...")
-    data = readData(file)
-    logging.info("读取数据完毕")
-    loadData2mysql('USDCAD', data)
-    logging.info("插入数据完毕")
+    file = '/backup/USDCAD.bak.txt'
+    logging.info("开始读取数据")
+    reader = pd.read_csv(file, sep=',', encoding='UTF-8', iterator=True)
+    loop = True
+    count = 0
+    while loop :
+        subdata = reader.get_chunk(200)
+        subdata['date'] = combineTime(subdata['DTYYYYMMDD'], subdata['TIME'], count)
+        subdata['date'] = convertDate(subdata['date'])
+
+        logging.info("读取数据完毕:" + str(len(subdata)))
+        loadData2mysql(subdata, count)
+        logging.info("插入数据完毕:" + str(len(subdata)))
+
+        count += len(subdata)
+
+        if len(subdata) < 200: loop = False
+
+    logging.info("插入数据完毕!共插入:" + str(count))
+
 
 if __name__ == '__main__' :
     main()
