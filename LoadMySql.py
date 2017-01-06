@@ -98,7 +98,7 @@ def main(file) :
 
 if __name__ == '__main__' :
     file = ''
-    if len(sys.argv == 2) :
+    if len(sys.argv) == 2 :
         file = sys.argv[1]
     else :
         file = '/backup/USDCAD.txt'
