@@ -46,11 +46,13 @@ def convertDate(time) :
 def readData(file) :
     data = pd.read_csv(file, sep=',', encoding='UTF-8')
     data['date'] = combineTime(data['DTYYYYMMDD'], data['TIME'])
+    data.drop('DTYYYYMMDD')
+    data.drop('TIME')
     data['date'] = convertDate(data['date'])
     return data
 
-def loadData2mysql(variety,data) :
-    sql = "insert into his_data(id,variety,period,date,open,high,low,close,vol,timestamp) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,now())"
+def loadData2mysql(ticker,data) :
+    sql = "insert into his_data(id,ticker,period,date,open,high,low,close,vol,timestamp) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,now())"
     try:
         conn = MySQLdb.connect("120.27.92.201", "root", "Best12167", "forex")
         cur = conn.cursor()
@@ -62,8 +64,8 @@ def loadData2mysql(variety,data) :
         for i in range(len(data)):
             value = []
             value.append(uuid.uuid4())
-            value.append(variety)
-            value.append('MIN')
+            value.append(data['TICKER'][i])
+            value.append('SECOND')
             value.append(data['date'][i])
             value.append(data['OPEN'][i])
             value.append(data['HIGH'][i])
@@ -89,7 +91,7 @@ def loadData2mysql(variety,data) :
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
 def main() :
-    file = '/backup/USDCAD.bak.txt'
+    file = '/backup/USDCAD.txt'
     logging.info("开始读取数据...")
     data = readData(file)
     logging.info("读取数据完毕")
