@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 import logging
+import sys
 import MySQLdb
 import pandas as pd
 import numpy as np
@@ -74,8 +75,7 @@ def loadData2mysql(data, count) :
     except MySQLdb.Error, e:
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
-def main() :
-    file = '/backup/USDCAD.bak.txt'
+def main(file) :
     logging.info("开始读取数据")
     reader = pd.read_csv(file, sep=',', encoding='UTF-8', iterator=True)
     loop = True
@@ -97,4 +97,9 @@ def main() :
 
 
 if __name__ == '__main__' :
-    main()
+    file = ''
+    if len(sys.argv == 2) :
+        file = sys.argv[1]
+    else :
+        file = '/backup/USDCAD.txt'
+    main(file)
