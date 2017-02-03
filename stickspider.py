@@ -42,9 +42,9 @@ if __name__ == '__main__' :
     logger = getLogger(train_date)
     while True :
         msg = getTicketMsg(train_date)
-        if msg[0] != u'无' :
+        if msg[0] != u'无' and msg[0] != '*':
             logger.info(u'硬卧有啦----------------')
-        if msg[1] != u'无' :
+        if msg[1] != u'无' and msg[0] != '*':
             logger.info(u'软卧有啦----------------')
         logger.info(msg[2])
         time.sleep(5)
