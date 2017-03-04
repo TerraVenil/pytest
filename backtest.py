@@ -13,7 +13,7 @@ def handle_data(context, data):
 
 algor_obj = TradingAlgorithm(initialize=initialize, handle_data=handle_data)
 
-data_s = pd.read_csv('.／data/AAPL.csv', parse_dates=['date'], index_col=0)
+data_s = pd.read_csv('./data/AAPL.csv', parse_dates=['date'], index_col=0)
 data_c = pd.Panel({'AAPL': data_s})
 
 perf_manual = algor_obj.run(data_c)
